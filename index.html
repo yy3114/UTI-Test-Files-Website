@@ -1,0 +1,1655 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>泌尿道感染臨床測驗</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #2c3e50;
+            line-height: 1.7;
+            /* 嘗試防止選取和右鍵菜單 */
+            -webkit-user-select: none; /* Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* IE10+ */
+            user-select: none; /* Standard */
+        }
+        .quiz-container {
+            background-color: #ffffff;
+            border-radius: 1.5rem;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+        .header-section {
+            background-image: url('https://i.postimg.cc/MHKWgXX9/78628714-s.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #1f2937; /* Fallback color */
+            position: relative;
+            overflow: hidden;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 160px;
+            border-bottom: 1px solid #e2e8f0;
+            border-radius: 1.5rem 1.5rem 0 0; /* Only top corners rounded */
+        }
+        .header-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Dark overlay */
+            z-index: 0;
+        }
+        .header-content-wrapper {
+            background-color: rgba(255, 255, 255, 0.4); /* More transparent */
+            border-radius: 1.5rem;
+            padding: 0.75rem 1.5rem;
+            box-shadow:
+                0 5px 15px rgba(0, 0, 0, 0.15),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.6),
+                inset 0 0 0 4px rgba(0, 0, 0, 0.05);
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            max-width: 90%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .header-content-wrapper:hover {
+            transform: translateY(-5px);
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.25),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.7),
+                inset 0 0 0 4px rgba(0, 0, 0, 0.1);
+        }
+        .header-title {
+            color: #1a202c; /* Deep blue */
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 0;
+            line-height: 1.2;
+            text-align: center; /* Explicitly centered */
+        }
+        @media (min-width: 640px) {
+            .header-title {
+                font-size: 2rem;
+            }
+        }
+
+        .question-card {
+            background-color: #f8fafc;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+            border: 1px solid #e2e8f0;
+        }
+        .option-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+            border: 1px solid #e2e8f0;
+        }
+        .option-item:hover {
+            background-color: #eff6ff;
+            border-color: #93c5fd;
+        }
+        .option-item input[type="radio"] {
+            margin-right: 0.75rem;
+            margin-top: 0.25rem; /* Align radio button with text */
+            flex-shrink: 0;
+        }
+        .option-item.selected {
+            background-color: #dbeafe;
+            border-color: #60a5fa;
+        }
+        .option-item.correct {
+            background-color: #d1fae5; /* Green for correct */
+            border-color: #34d399;
+        }
+        .option-item.incorrect {
+            background-color: #fee2e2; /* Red for incorrect */
+            border-color: #ef4444;
+        }
+        .option-item.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .score-bar-container {
+            background-color: #e5e7eb;
+            border-radius: 9999px; /* Full rounded */
+            height: 1.5rem;
+            overflow: hidden;
+            margin-top: 1.5rem;
+        }
+        .score-bar {
+            height: 100%;
+            border-radius: 9999px;
+            transition: width 0.5s ease-out, background-color 0.5s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        .score-bar.low { background-color: #ef4444; } /* Red */
+        .score-bar.medium { background-color: #f59e0b; } /* Orange */
+        .score-bar.high { background-color: #10b981; } /* Green */
+
+        .timer-display {
+            position: fixed; /* Fixed position */
+            top: 1rem; /* From top */
+            right: 1rem; /* From right */
+            background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ef4444; /* Red for urgency */
+            z-index: 1000; /* Ensure it's on top */
+            text-align: center;
+            min-width: 100px; /* Ensure consistent width */
+        }
+        /* Adjust for smaller screens if needed */
+        @media (max-width: 640px) {
+            .timer-display {
+                top: 0.5rem;
+                right: 0.5rem;
+                font-size: 1.2rem;
+                padding: 0.5rem 1rem;
+            }
+        }
+
+        .feedback-message {
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+        }
+        .feedback-correct { background-color: #d1fae5; color: #065f46; }
+        .feedback-incorrect { background-color: #fee2e2; color: #991b1b; }
+        .feedback-info { background-color: #e0f2fe; color: #1e40af; }
+
+        /* Hide elements before quiz starts */
+        #quizContent, #scoreDisplay, #feedbackMessage, #submitButton, #newQuizButton, #timerContainer, #retakeQuizButton {
+            display: none;
+        }
+
+        /* Style for disabled buttons */
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;"> <!-- Basic right-click prevention -->
+    <div class="quiz-container">
+        <!-- Header Section -->
+        <header class="header-section">
+            <div class="header-content-wrapper">
+                <h1 class="header-title">
+                    泌尿道感染 (UTI)<br>原因探討
+                </h1>
+            </div>
+        </header>
+
+        <!-- Fixed Timer Display -->
+        <div id="timerContainer" class="timer-display">
+            <span id="timer">10:00</span>
+        </div>
+
+        <!-- Main Quiz Content -->
+        <main class="p-6 sm:p-10">
+            <div id="quizStartScreen" class="text-center">
+                <p class="text-lg mb-6">歡迎來到泌尿道感染臨床測驗！本測驗包含10道選擇題，有10分鐘作答時間。您總共有兩次完成整個測驗的機會。<span id="attemptsLeftDisplay">您還有 2 次測驗機會。</span>全數答對者，請截圖滿分畫面傳給小編，每人贈送「統一 來一客 京燉肉骨風味杯麵」一個，不限人數。祝您好運！</p>
+                <button id="startButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 transform hover:scale-105">
+                    開始答題
+                </button>
+            </div>
+
+            <div id="quizContent" class="hidden">
+                <div class="question-card">
+                    <p class="text-xl font-semibold mb-4" id="questionText"></p>
+                    <div id="optionsContainer">
+                        <!-- Options will be dynamically loaded here -->
+                    </div>
+                </div>
+
+                <div class="flex justify-center mt-6">
+                    <button id="submitButton" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 transform hover:scale-105">
+                        提交答案
+                    </button>
+                </div>
+
+                <div id="feedbackMessage" class="feedback-message hidden"></div>
+            </div>
+
+            <div id="scoreDisplay" class="hidden mt-8">
+                <h2 class="text-2xl font-bold text-center mb-4">您的測驗結果</h2>
+                <div class="score-bar-container">
+                    <div id="scoreBar" class="score-bar" style="width: 0%;"></div>
+                </div>
+                <p class="text-center text-lg font-semibold mt-4" id="scoreText"></p>
+                <p class="text-center text-xl font-bold text-yellow-600 mt-4 hidden" id="prizeMessage">
+                    <span class="text-3xl mr-2">🎁</span>恭喜您獲得滿分！請截圖此畫面傳送給小編，即可獲得「統一 來一客 京燉肉骨風味杯麵」一個！
+                </p>
+                <div id="quizSummary" class="mt-6 text-gray-700">
+                    <h3 class="text-xl font-bold mb-3">測驗詳情：</h3>
+                    <ul id="summaryList" class="list-disc list-inside pl-4"></ul>
+                </div>
+                <div class="flex justify-center mt-8 space-x-4">
+                    <button id="retakeQuizButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 transform hover:scale-105">
+                        重新測驗
+                    </button>
+                    <!-- Removed "回到首頁" button -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer Section -->
+        <footer class="bg-gray-800 text-gray-300 p-6 sm:p-8 text-center text-sm rounded-b-xl mt-8">
+            <p class="mb-2">&copy; 2025 泌尿道感染知識網站。版權所有。</p>
+            <p>參考指引：AUA (美國泌尿科協會), EAU (歐洲泌尿科協會), EBM (實證醫學) 等。</p>
+            <p class="text-xs mt-2 text-gray-500">免責聲明：本測驗僅供教育用途，不應替代專業醫療建議。網頁環境無法完全阻止螢幕截圖。</p>
+        </footer>
+    </div>
+
+    <script>
+        // Audio context for ticking sound
+        let audioContext;
+        let oscillator;
+        let gainNode;
+
+        // Function to play a simple tick sound
+        function playTickSound() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                oscillator = audioContext.createOscillator();
+                gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.type = 'sine'; // A soft, pure tone
+                oscillator.frequency.setValueAtTime(440, audioContext.currentTime); // A4 note
+                gainNode.gain.setValueAtTime(0.05, audioContext.currentTime); // Very quiet
+                oscillator.start();
+            }
+
+            // Trigger a quick pulse
+            gainNode.gain.cancelScheduledValues(audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.05, audioContext.currentTime); // Start volume
+            gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.05); // Fade out quickly
+        }
+
+        // Full question bank (50 questions)
+        const fullQuestionBank = [
+            {
+                question: "一位78歲男性患者，有良性前列腺增生(BPH)病史，長期服用Tamsulosin。近來主訴排尿困難加劇、頻尿、夜尿，並出現輕微血尿。尿液常規檢查顯示白血球酯酶陽性、亞硝酸鹽陽性，尿沉渣有大量白血球。患者無發燒。護理師應優先考慮哪項處置？",
+                options: [
+                    "建議患者增加飲水量以稀釋尿液。",
+                    "評估患者排尿後餘尿量，並考慮導尿。",
+                    "指導患者進行凱格爾運動以改善膀胱功能。",
+                    "立即給予廣效性抗生素治療。"
+                ],
+                answer: 1, // 評估患者排尿後餘尿量，並考慮導尿。
+                explanation: "患者有BPH病史，排尿困難加劇，提示可能存在尿液滯留，這是UTI的重要危險因素。尿液常規檢查結果支持UTI診斷。評估餘尿量（如使用膀胱掃描儀）是判斷尿液滯留嚴重程度的關鍵，若餘尿量過多，可能需要導尿以解除阻塞並治療感染，這比單純增加飲水或凱格爾運動更為緊急和直接。在未明確病原體及藥敏結果前，不應立即給予廣效抗生素，應先留取尿液培養。"
+            },
+            {
+                question: "一位28歲女性患者，過去一年內曾有三次泌尿道感染，每次均使用Trimethoprim-sulfamethoxazole (TMP-SMX) 治療。此次因急性膀胱炎症狀就診，尿液培養結果顯示大腸桿菌(E. coli)對TMP-SMX具高度抗藥性。患者自述近期有頻繁性行為。護理師在衛教時應強調哪些預防措施？",
+                options: [
+                    "建議患者每次性行為後立即排尿。",
+                    "指導患者口服蔓越莓萃取物以預防感染。",
+                    "建議患者考慮長期低劑量抗生素預防性治療。",
+                    "強調使用陰道益生菌以維持陰道菌群平衡。"
+                ],
+                answer: 0, // 建議患者每次性行為後立即排尿。
+                explanation: "對於復發性UTI的年輕女性，性行為是常見的觸發因素。性交後立即排尿有助於沖刷進入尿道的細菌，是重要的行為預防措施。蔓越莓萃取物效果不一，益生菌尚無充分證據，長期低劑量抗生素預防性治療是醫囑，而非護理師可直接建議的預防措施，且需考慮抗藥性問題。"
+            },
+            {
+                question: "一位6個月大嬰兒，無特殊病史，因不明原因發燒3天就診。身體檢查無明顯異常，但尿液常規檢查顯示白血球數目升高。兒科醫師懷疑泌尿道感染。根據日本兒科泌尿學會指引，此時最優先且具確診意義的檢查為何？",
+                options: [
+                    "收集尿布尿液進行細菌培養。",
+                    "進行膀胱導尿採集尿液進行細菌培養。",
+                    "立即給予口服抗生素治療。",
+                    "安排腎臟超音波檢查。"
+                ],
+                answer: 1, // 進行膀胱導尿採集尿液進行細菌培養。
+                explanation: "對於嬰幼兒，尿液污染率高，因此膀胱導尿採集尿液是獲得無污染尿液標本進行細菌培養的黃金標準，具有最高的確診意義。尿布尿液易受污染，不具確診價值。在確診前不應立即給予抗生素，腎臟超音波是評估泌尿道結構異常的檢查，通常在確診UTI後進行。"
+            },
+            {
+                question: "一位55歲女性糖尿病患者，因反覆泌尿道感染就診。此次尿液培養結果顯示為多重抗藥性綠膿桿菌(Pseudomonas aeruginosa)。患者腎功能輕度受損 (eGFR 55 mL/min/1.73m²)。根據歐洲泌尿科協會(EAU)指引，在考慮抗生素治療時，下列哪項考量最為重要？",
+                options: [
+                    "優先選擇口服抗生素以方便患者。",
+                    "選擇對綠膿桿菌敏感且腎臟排泄較少的抗生素。",
+                    "根據藥敏結果選擇靜脈注射抗生素，並調整劑量。",
+                    "建議患者控制血糖以降低感染風險。"
+                ],
+                answer: 2, // 根據藥敏結果選擇靜脈注射抗生素，並調整劑量。
+                explanation: "多重抗藥性綠膿桿菌感染通常需要靜脈注射抗生素。患者腎功能受損，因此必須根據腎功能調整抗生素劑量，以避免藥物蓄積和毒性。控制血糖是長期預防措施，但對於急性感染治療，藥物選擇和劑量調整是當務之急。"
+            },
+            {
+                question: "一位長期臥床的85歲失智症患者，留置導尿管。護理師發現導尿管周圍有膿性分泌物，且患者體溫38.5°C。尿液培養結果為Proteus mirabilis，對多種常用抗生素敏感。護理師應如何處置以降低感染復發率？",
+                options: [
+                    "立即更換導尿管並留取新的尿液培養。",
+                    "增加導尿管周圍的清潔頻率。",
+                    "評估患者是否適合移除導尿管，並考慮其他排尿方式。",
+                    "加強會陰部護理，每日使用消毒液清洗。"
+                ],
+                answer: 2, // 評估患者是否適合移除導尿管，並考慮其他排尿方式。
+                explanation: "導尿管相關泌尿道感染 (CAUTI) 是常見問題，導尿管本身就是細菌形成生物膜的溫床，移除不必要的導尿管是降低感染風險和復發率最有效的方法。其他選項是護理措施，但不如移除導尿管來得根本。"
+            },
+            {
+                question: "一位35歲女性患者，因急性腎盂腎炎住院治療。經靜脈注射Ceftriaxone治療3天後，患者體溫恢復正常，症狀顯著改善。根據美國感染病學會(IDSA)指引，此時的護理計畫應包含哪項建議？",
+                options: [
+                    "立即停止抗生素治療，觀察症狀。",
+                    "將靜脈注射抗生素改為口服抗生素，並完成完整療程。",
+                    "建議患者出院後每日飲用大量果汁。",
+                    "安排腎臟活組織檢查以評估腎臟損傷程度。"
+                ],
+                answer: 1, // 將靜脈注射抗生素改為口服抗生素，並完成完整療程。
+                explanation: "急性腎盂腎炎通常需要完成一個完整療程的抗生素治療，即使症狀改善也應繼續。在症狀穩定後，可以從靜脈注射轉換為口服抗生素，以方便患者並減少住院時間。立即停藥或安排侵入性檢查是不恰當的。"
+            },
+            {
+                question: "一位22歲男性患者，因劇烈腰痛伴血尿就診。影像學檢查顯示左側輸尿管結石伴輕度腎盂積水。尿液常規檢查提示感染。在等待尿液培養結果期間，護理師應特別關注患者哪些潛在的嚴重併發症？",
+                options: [
+                    "高血壓危象。",
+                    "急性腎衰竭。",
+                    "敗血症性休克。",
+                    "低血糖症。"
+                ],
+                answer: 2, // 敗血症性休克。
+                explanation: "輸尿管結石伴感染和腎盂積水，可能導致阻塞性尿路感染，細菌和毒素容易逆流進入血液，引起尿源性敗血症，進而發展為敗血症性休克，這是一種危及生命的緊急情況，需密切監測生命徵象。"
+            },
+            {
+                question: "一位68歲女性患者，因脊髓損傷導致神經性膀胱，長期需要間歇性導尿。她主訴近期尿液混濁且有異味，無發燒。尿液培養結果為Enterococcus faecalis，對多數口服抗生素敏感。護理師在衛教患者時，除了抗生素治療外，還應強調哪項長期護理措施？",
+                options: [
+                    "建議患者減少導尿頻率以降低感染風險。",
+                    "指導患者定期更換導尿管品牌。",
+                    "強調正確的無菌導尿技術和手部衛生。",
+                    "建議患者自行增加抗生素劑量以預防感染。"
+                ],
+                answer: 2, // 強調正確的無菌導尿技術和手部衛生。
+                explanation: "對於神經性膀胱需要間歇性導尿的患者，正確的無菌導尿技術和嚴格的手部衛生是預防UTI的基石。減少導尿頻率可能導致尿液滯留，增加感染風險。更換導尿管品牌與預防感染無直接關係。自行增加抗生素劑量是錯誤且危險的行為。"
+            },
+            {
+                question: "一位40歲女性患者，因反覆發作的無症狀菌尿症(Asymptomatic Bacteriuria, ASB)就診。患者無糖尿病、無懷孕、無泌尿道結構異常。根據韓國傳染病學會指引，護理師應如何向患者解釋其狀況？",
+                options: [
+                    "ASB需要立即使用抗生素治療以避免腎臟損傷。",
+                    "ASB在大多數情況下無需治療，除非出現特定高風險情況。",
+                    "ASB意味著患者免疫力低下，需長期服用免疫增強劑。",
+                    "ASB是泌尿道感染的早期階段，未來必然會發展為有症狀感染。"
+                ],
+                answer: 1, // ASB在大多數情況下無需治療，除非出現特定高風險情況。
+                explanation: "根據國際指引，無症狀菌尿症在大多數非懷孕、非免疫抑制的成年人中無需治療，因為治療並不能降低未來發生有症狀UTI的風險，反而可能增加抗生素耐藥性。只有在懷孕、泌尿道手術前等特定高風險情況下才建議治療。"
+            },
+            {
+                question: "一位60歲女性患者，因反覆泌尿道感染，檢查發現膀胱內有長期留置的結石。患者曾多次使用不同種類抗生素治療，但感染仍持續。根據美國泌尿科協會(AUA)指引，此類情況的根本解決方案應優先考慮哪項？",
+                options: [
+                    "長期低劑量抗生素預防性治療。",
+                    "膀胱灌注抗生素治療。",
+                    "手術移除膀胱結石。",
+                    "定期膀胱沖洗以減少細菌附著。"
+                ],
+                answer: 2, // 手術移除膀胱結石。
+                explanation: "膀胱結石作為異物，是細菌形成生物膜和導致持續性UTI的重要原因。在這種情況下，如果不移除結石，抗生素治療效果會非常有限且容易復發。手術移除結石是解決根本問題的優先方案。"
+            },
+            {
+                question: "關於導尿管相關泌尿道感染 (CAUTI) 的預防，下列哪項護理措施最為關鍵？",
+                options: [
+                    "每日更換導尿管。",
+                    "定期使用抗生素沖洗膀胱。",
+                    "確保導尿管閉鎖引流系統的完整性。",
+                    "限制患者飲水量以減少排尿次數。"
+                ],
+                answer: 2,
+                explanation: "確保閉鎖引流系統的完整性是預防CAUTI的核心措施，因為它可以有效阻止細菌從外部進入泌尿系統。每日更換導尿管是不必要的且可能增加感染風險。抗生素沖洗膀胱不推薦常規使用，限制飲水量可能導致尿液濃縮，不利於預防感染。"
+            },
+            {
+                question: "一位長期服用免疫抑制劑的腎臟移植患者，出現不明原因發燒。尿液常規檢查正常，但血培養陽性。護理師應警惕何種感染？",
+                options: [
+                    "單純性膀胱炎。",
+                    "無症狀菌尿症。",
+                    "全身性敗血症。",
+                    "腎結石感染。"
+                ],
+                answer: 2,
+                explanation: "免疫抑制患者的感染表現可能不典型，尿液檢查正常不能排除泌尿系統感染源。發燒伴血培養陽性強烈提示全身性感染，即敗血症。這是一種危及生命的緊急情況，需要立即處理。單純性膀胱炎和無症狀菌尿症通常不會導致血培養陽性，腎結石感染可能導致敗血症，但敗血症本身是更直接的診斷。"
+            },
+            {
+                question: "一位懷孕20週的女性，常規產檢發現無症狀菌尿症。根據指引，下列何者為最佳處置？",
+                options: [
+                    "無需治療，定期觀察即可。",
+                    "立即給予口服抗生素治療。",
+                    "建議患者多喝蔓越莓汁。",
+                    "安排腎臟超音波檢查。"
+                ],
+                answer: 1,
+                explanation: "懷孕期間的無症狀菌尿症必須治療，因為它會顯著增加發展為急性腎盂腎炎的風險，這可能對母親和胎兒造成嚴重影響。這是少數需要治療ASB的特殊情況之一。"
+            },
+            {
+                question: "一位患有脊髓損傷的患者，進行間歇性導尿時，突然出現寒顫、高燒。護理師應優先懷疑何種情況？",
+                options: [
+                    "低血糖反應。",
+                    "自主神經反射異常 (Autonomic Dysreflexia)。",
+                    "急性泌尿道感染合併菌血症。",
+                    "藥物過敏反應。"
+                ],
+                answer: 2,
+                explanation: "對於脊髓損傷患者，間歇性導尿是常見的排尿管理方式，但也是UTI的高風險因素。寒顫和高燒是全身性感染的典型症狀，尤其是在泌尿系統操作後，應高度懷疑急性泌尿道感染合併菌血症（即細菌進入血液循環）。自主神經反射異常通常伴有血壓急劇升高和心動過緩，而低血糖和藥物過敏的表現通常不同。"
+            },
+            {
+                question: "一位70歲女性，因反覆泌尿道感染，醫師考慮給予陰道局部雌激素治療。護理師應如何向患者解釋其作用機制？",
+                options: [
+                    "雌激素能直接殺滅泌尿道細菌。",
+                    "雌激素能增強膀胱肌肉收縮力。",
+                    "雌激素能改善陰道菌群，降低pH值，增強局部抵抗力。",
+                    "雌激素能減少尿液產生，降低排尿頻率。"
+                ],
+                answer: 2,
+                explanation: "更年期後女性因雌激素水平下降，陰道和尿道黏膜萎縮，pH值升高，導致正常乳酸桿菌減少，病原菌更易定植。局部雌激素治療能恢復陰道黏膜健康，促進乳酸桿菌生長，降低pH值，從而增強局部對UTI的抵抗力。"
+            },
+            {
+                question: "一位兒童因膀胱輸尿管逆流 (VUR) 導致反覆泌尿道感染，已進行手術矯正。術後護理衛教應包含哪些重點？",
+                options: [
+                    "術後即可停止所有抗生素治療。",
+                    "鼓勵大量飲水，但需避免排尿。",
+                    "定期回診進行尿液檢查和影像學追蹤，並觀察排尿習慣。",
+                    "術後需長期臥床休息，避免活動。"
+                ],
+                answer: 2,
+                explanation: "VUR手術矯正後，仍需定期回診追蹤，包括尿液檢查以監測是否有殘餘感染或復發，以及影像學檢查評估手術效果和腎臟健康狀況。同時，觀察排尿習慣對預防未來感染也很重要。術後通常仍需短期抗生素，且不應避免排尿或長期臥床。"
+            },
+            {
+                question: "一位男性患者，因急性附睪炎就診，同時伴有排尿疼痛。尿液培養顯示淋病雙球菌。護理師應關注哪些傳播途徑？",
+                options: [
+                    "食物傳播。",
+                    "水傳播。",
+                    "性接觸傳播。",
+                    "空氣飛沫傳播。"
+                ],
+                answer: 2,
+                explanation: "淋病雙球菌是性傳播感染 (STI) 的常見病原體。男性泌尿生殖系統感染，如附睪炎，若由淋病引起，則主要通過性接觸傳播。護理師應對患者進行性健康衛教，並建議其伴侶進行檢測和治療。"
+            },
+            {
+                question: "一位糖尿病患者，因反覆泌尿道感染導致腎功能惡化。護理師應建議患者如何調整生活方式以降低風險？",
+                options: [
+                    "減少飲水量以降低排尿頻率。",
+                    "嚴格控制血糖水平。",
+                    "避免使用肥皂清洗會陰部。",
+                    "僅在出現症狀時才就醫。"
+                ],
+                answer: 1,
+                explanation: "糖尿病患者因高血糖導致免疫功能受損，尿液中糖分升高也利於細菌生長，因此嚴格控制血糖是降低UTI風險的關鍵。減少飲水量不利於沖刷細菌，避免使用肥皂清洗會陰部是通用衛教，但血糖控制對糖尿病患者更為根本。僅在出現症狀時就醫可能延誤治療。"
+            },
+            {
+                question: "在照護一名有留置導尿管的患者時，為避免交叉感染，護理師應避免下列哪項行為？",
+                options: [
+                    "每次接觸導尿管前進行手部衛生。",
+                    "將尿袋置於高於膀胱的水平。",
+                    "定期檢查引流管是否有扭結或阻塞。",
+                    "每日進行會陰部清潔。"
+                ],
+                answer: 1,
+                explanation: "將尿袋置於高於膀胱的水平會導致尿液回流，增加逆行性感染的風險。正確的做法是始終將尿袋置於膀胱水平以下。其他選項都是正確的感染控制措施。"
+            },
+            {
+                question: "一位患者因泌尿道感染接受抗生素治療後，出現腹瀉。糞便檢查顯示艱難梭菌毒素陽性。護理師應如何處置？",
+                options: [
+                    "立即停止所有抗生素治療。",
+                    "給予止瀉劑以緩解腹瀉。",
+                    "隔離患者，並考慮使用針對艱難梭菌的抗生素。",
+                    "建議患者多吃高纖維食物。"
+                ],
+                answer: 2,
+                explanation: "艱難梭菌感染 (CDI) 是抗生素相關腹瀉的常見原因，具有傳染性，需要隔離患者以防止傳播。治療通常涉及停用引起CDI的抗生素，並給予針對艱難梭菌的特定抗生素（如Metronidazole或Vancomycin）。止瀉劑可能加重病情，高纖維食物對急性CDI無直接治療作用。"
+            },
+            {
+                question: "一位長期臥床的80歲女性患者，因反覆發燒且尿液混濁，診斷為泌尿道感染。患者有慢性腎臟病史。在選擇抗生素時，醫師應特別注意哪項藥物特性？",
+                options: [
+                    "藥物是否具有廣效性。",
+                    "藥物是否對腎臟有毒性。",
+                    "藥物是否能口服給予。",
+                    "藥物是否價格低廉。"
+                ],
+                answer: 1,
+                explanation: "對於有慢性腎臟病史的患者，腎功能可能受損，許多藥物主要經腎臟排泄。選擇對腎臟有毒性的藥物可能加重腎損傷，因此應優先考慮對腎臟毒性較低或需要根據腎功能調整劑量的抗生素。"
+            },
+            {
+                question: "一位男性患者，因腎結石導致尿路阻塞並引起泌尿道感染。在緊急處理後，患者的發燒和疼痛有所緩解。下一步的處置重點應為何？",
+                options: [
+                    "長期服用抗生素以預防復發。",
+                    "進行尿液培養以確認病原菌。",
+                    "安排手術移除腎結石。",
+                    "建議患者多喝水以排出結石。"
+                ],
+                answer: 2,
+                explanation: "腎結石引起的尿路阻塞是感染的根本原因。雖然急性感染得到控制，但若不移除結石，感染會反覆發作。因此，安排手術移除結石是解決根本問題的關鍵下一步。尿液培養在治療前就應進行，多喝水對排出較大的結石效果有限。"
+            },
+            {
+                question: "一位年輕女性患者，因急性膀胱炎就診。她表示這是她第一次泌尿道感染。護理師在衛教時，下列哪項建議最不適當？",
+                options: [
+                    "建議患者完成整個抗生素療程，即使症狀消失。",
+                    "指導患者性交後立即排尿。",
+                    "建議患者每日飲用大量水份。",
+                    "建議患者長期服用蔓越莓萃取物作為預防手段。"
+                ],
+                answer: 3,
+                explanation: "對於首次發生急性膀胱炎的患者，完成抗生素療程、性交後排尿和多飲水是標準且有效的衛教。而長期服用蔓越莓萃取物作為預防手段，其效果在醫學上仍有爭議，且對於首次感染的患者，通常不作為首要或唯一的預防建議，因此最不適當。"
+            },
+            {
+                question: "一位長期糖尿病控制不佳的患者，因反覆泌尿道感染就診。除了藥物治療外，護理師應強調哪項最重要的長期管理措施？",
+                options: [
+                    "定期進行膀胱沖洗。",
+                    "嚴格控制血糖水平。",
+                    "限制蛋白質攝入。",
+                    "避免所有含糖飲料。"
+                ],
+                answer: 1,
+                explanation: "糖尿病患者因血糖控制不佳導致免疫功能受損，尿液中糖分升高也利於細菌生長，因此嚴格控制血糖是降低UTI風險和復發率最重要的長期管理措施。"
+            },
+            {
+                question: "一位因脊髓損傷導致神經性膀胱的患者，其間歇性導尿技術正確，但仍有反覆泌尿道感染。護理師應考慮評估患者的哪項因素？",
+                options: [
+                    "飲食習慣是否均衡。",
+                    "導尿管的材質是否合適。",
+                    "膀胱排空是否完全。",
+                    "患者的睡眠質量。"
+                ],
+                answer: 2,
+                explanation: "即使導尿技術正確，如果膀胱排空不完全，殘餘尿液仍會成為細菌滋生的溫床，導致反覆感染。因此，評估膀胱排空是否完全是關鍵。導尿管材質、飲食和睡眠質量雖然可能間接影響健康，但對間歇性導尿患者的反覆感染而言，膀胱排空不完全是更直接且常見的原因。"
+            },
+            {
+                question: "一位接受腎臟移植手術後的患者，術後出現發燒、腰痛、排尿困難。尿液培養顯示為巨細胞病毒(CMV)感染。護理師應理解此類感染的特殊性為何？",
+                options: [
+                    "CMV感染通常無需特殊治療，會自行痊癒。",
+                    "CMV感染僅影響泌尿系統，不會影響其他器官。",
+                    "CMV感染在免疫抑制患者中可能引起嚴重全身性疾病。",
+                    "CMV感染可通過口服抗生素有效治療。"
+                ],
+                answer: 2,
+                explanation: "巨細胞病毒(CMV)在免疫功能正常者中通常無症狀或輕微，但在免疫抑制患者（如器官移植受者）中可能引起嚴重的全身性疾病，影響多個器官，甚至危及生命。它不是細菌感染，因此口服抗生素無效，需要抗病毒藥物治療。"
+            },
+            {
+                question: "一位長期使用抗生素預防復發性泌尿道感染的女性患者，近期出現陰道搔癢和分泌物增多。護理師應懷疑哪種情況？",
+                options: [
+                    "抗生素治療失敗。",
+                    "新的泌尿道感染。",
+                    "陰道念珠菌感染。",
+                    "藥物過敏反應。"
+                ],
+                answer: 2,
+                explanation: "長期或廣泛使用抗生素會破壞身體正常的菌群平衡，尤其是陰道內的乳酸桿菌，從而導致念珠菌（一種真菌）過度生長，引起陰道念珠菌感染，其典型症狀就是陰道搔癢和分泌物增多。"
+            },
+            {
+                question: "一位因外傷導致尿道損傷的男性患者，接受了尿道修復手術。術後護理衛教中，哪項對於預防術後併發症最為重要？",
+                options: [
+                    "鼓勵患者盡早下床活動。",
+                    "嚴格控制飲水量以減少排尿。",
+                    "觀察排尿情況，警惕尿道狹窄的發生。",
+                    "建議患者長期留置導尿管。"
+                ],
+                answer: 2,
+                explanation: "尿道修復術後最常見且嚴重的併發症之一是尿道狹窄。因此，術後護理衛教應重點強調觀察排尿情況，如尿流變細、排尿困難等，以便及早發現並處理尿道狹窄。盡早活動是為了預防其他併發症，但不如觀察尿道狹窄來得直接相關。控制飲水量和長期留置導尿管是不恰當的。"
+            },
+            {
+                question: "一位老年女性患者，因反覆泌尿道感染，檢查發現有輕度膀胱脫垂。護理師應建議患者考慮哪項非藥物治療措施？",
+                options: [
+                    "長期使用抗生素預防。",
+                    "進行盆底肌運動（凱格爾運動）。",
+                    "限制液體攝入。",
+                    "每日進行陰道沖洗。"
+                ],
+                answer: 1,
+                explanation: "膀胱脫垂可能導致排尿不完全，增加尿液滯留和感染風險。盆底肌運動（凱格爾運動）可以增強盆底肌肉力量，改善膀胱支持，有助於改善排尿功能，從而間接降低UTI風險。長期抗生素預防應在醫師指導下進行，限制液體攝入不利於預防感染，陰道沖洗可能破壞陰道菌群平衡。"
+            },
+            {
+                question: "一位患者因長期糖尿病導致神經性膀胱，排尿功能障礙。護理師在衛教患者如何自我管理時，應強調哪項措施？",
+                options: [
+                    "完全避免排尿，等待自然排空。",
+                    "使用腹部加壓法幫助排尿。",
+                    "定期進行清潔間歇性導尿。",
+                    "增加咖啡因攝入以刺激排尿。"
+                ],
+                answer: 2,
+                explanation: "對於神經性膀胱導致排尿功能障礙的患者，清潔間歇性導尿是有效且安全的排尿管理方式，可以確保膀胱完全排空，從而預防尿液滯留引起的感染。完全避免排尿會導致尿液滯留和膀胱過度膨脹。腹部加壓法可能有效但需評估。咖啡因會刺激膀胱，可能加重症狀而非改善排尿功能。"
+            },
+            {
+                question: "一位男性患者，因急性前列腺炎就診，伴有高燒、寒顫和會陰部疼痛。尿液培養結果顯示為大腸桿菌。除了抗生素治療，護理師應特別注意哪項支持性護理？",
+                options: [
+                    "鼓勵患者多活動以促進血液循環。",
+                    "指導患者進行熱水坐浴以緩解疼痛。",
+                    "建議患者減少飲水量以避免頻尿。",
+                    "立即進行導尿以緩解排尿困難。"
+                ],
+                answer: 1,
+                explanation: "急性前列腺炎常伴有會陰部疼痛和排尿不適。熱水坐浴可以幫助緩解會陰部肌肉痙攣，促進局部血液循環，從而減輕疼痛和不適感。急性前列腺炎通常不建議導尿，以免加重感染或引起菌血症。"
+            },
+            {
+                question: "一位腎臟移植術後患者，長期服用免疫抑制劑。近期出現輕微發燒、食慾不振，尿液常規檢查無異常。血清肌酐酸水平輕微升高。護理師應優先考慮哪項檢查以排除泌尿道感染？",
+                options: [
+                    "重複尿液常規檢查。",
+                    "進行尿液培養和藥敏試驗。",
+                    "安排腎臟活組織檢查。",
+                    "進行膀胱鏡檢查。"
+                ],
+                answer: 1,
+                explanation: "免疫抑制患者的感染表現可能不典型，尿液檢查正常不代表沒有泌尿道感染。尿液培養和藥敏試驗是確診UTI的黃金標準，尤其是在移植患者中，早期診斷和針對性治療至關重要。腎臟活組織檢查是侵入性檢查，通常在高度懷疑排斥或嚴重腎損傷時考慮。"
+            },
+            {
+                question: "一位女性患者，因反覆性膀胱炎就診。她表示每次感染都與性行為有關。護理師在衛教時，除了性交後排尿，還應建議哪項預防措施？",
+                options: [
+                    "性交前服用預防性抗生素。",
+                    "使用陰道沖洗液清潔。",
+                    "避免使用殺精劑。",
+                    "限制性行為頻率。"
+                ],
+                answer: 2,
+                explanation: "殺精劑，尤其是含有壬苯醇醚-9 (Nonoxynol-9) 的殺精劑，已被證明會改變陰道菌群，增加UTI的風險。因此，對於反覆性膀胱炎患者，應建議避免使用殺精劑。性交前預防性抗生素是醫囑，陰道沖洗液可能破壞陰道菌群平衡，限制性行為頻率通常不是首選建議。"
+            },
+            {
+                question: "一位高齡男性患者，因尿失禁導致長期使用尿布。護理師發現患者會陰部皮膚潮濕、紅腫，並有異味。為預防泌尿道感染，護理師應優先採取哪項護理措施？",
+                options: [
+                    "增加尿布更換頻率，保持會陰部乾燥。",
+                    "使用強力消毒劑清洗會陰部。",
+                    "限制患者液體攝入以減少排尿。",
+                    "立即給予口服抗生素預防。"
+                ],
+                answer: 0,
+                explanation: "長期潮濕和不潔的會陰部是細菌滋生和引起UTI的重要因素。增加尿布更換頻率並保持會陰部乾燥，可以有效減少細菌暴露和皮膚刺激，是預防感染最基本且有效的措施。"
+            },
+            {
+                question: "一位患者因腎盂腎炎住院治療。在靜脈注射抗生素治療2天後，患者體溫仍持續升高。護理師應立即採取哪項行動？",
+                options: [
+                    "繼續觀察，等待抗生素發揮作用。",
+                    "建議醫師更換抗生素。",
+                    "重新評估患者生命徵象，並檢查是否有新的併發症。",
+                    "增加患者飲水量以促進藥物排泄。"
+                ],
+                answer: 2,
+                explanation: "抗生素治療2天後仍持續高燒，提示治療可能無效或出現了新的併發症（如膿腫形成、阻塞加劇、藥物無效等）。護理師應立即重新評估患者的整體狀況，包括生命徵象、疼痛變化、尿量等，並及時通知醫師，以便進一步檢查和調整治療方案。"
+            },
+            {
+                question: "一位因尿道狹窄導致反覆泌尿道感染的男性患者，接受了尿道擴張術。術後護理衛教應特別強調哪項？",
+                options: [
+                    "術後需長期臥床休息。",
+                    "避免任何形式的排尿，直到完全康復。",
+                    "定期自我導尿或使用導尿管維持尿道通暢。",
+                    "術後立即停用所有口服藥物。"
+                ],
+                answer: 2,
+                explanation: "尿道擴張術後，尿道狹窄可能復發。為了維持尿道通暢，部分患者可能需要定期自我導尿或留置導尿管一段時間，以防止再次狹窄。其他選項均不正確。"
+            },
+            {
+                question: "一位老年男性患者，因攝護腺肥大導致排尿困難，並反覆發生泌尿道感染。醫師建議進行經尿道攝護腺切除術 (TURP)。術前護理衛教應包含哪項重點？",
+                options: [
+                    "術後將立即恢復正常排尿。",
+                    "術後可能需要短期留置導尿管。",
+                    "術後無需服用任何藥物。",
+                    "術後應避免所有液體攝入。"
+                ],
+                answer: 1,
+                explanation: "TURP術後通常會短期留置導尿管以引流尿液和沖洗膀胱，防止血塊阻塞。術後排尿功能恢復需要時間，且可能需要服用止痛藥或抗生素。避免所有液體攝入是錯誤的。"
+            },
+            {
+                question: "一位女性患者，因急性膀胱炎就診。尿液檢查顯示細菌數目升高，但白血球數目正常。護理師應如何解讀此情況？",
+                options: [
+                    "這不是泌尿道感染，無需治療。",
+                    "可能是無症狀菌尿症，但需進一步評估。",
+                    "提示可能是病毒性膀胱炎。",
+                    "這是不典型的泌尿道感染，仍需治療。"
+                ],
+                answer: 3,
+                explanation: "雖然白血球數目正常可能提示炎症反應不強烈或免疫反應不足，但細菌數目升高且患者有症狀，仍應診斷為泌尿道感染並給予治療。這屬於非典型的UTI表現，但不能排除感染。"
+            },
+            {
+                question: "一位長期臥床的患者，留置導尿管。護理師在進行導尿管護理時，下列哪項操作是錯誤的？",
+                options: [
+                    "清潔導尿管口時，從尿道口向外清潔。",
+                    "將尿袋固定在床緣，避免接觸地面。",
+                    "定期擠壓導尿管，確保引流通暢。",
+                    "更換尿袋時，避免污染引流口。"
+                ],
+                answer: 2,
+                explanation: "擠壓導尿管可能導致管內壓力升高，增加尿液回流和細菌逆行感染的風險。正確的做法是確保導尿管自然引流，避免擠壓。"
+            },
+            {
+                question: "一位男性患者，因前列腺癌接受放射線治療後，出現放射性膀胱炎，表現為頻尿、尿急、血尿。護理師應建議患者如何緩解症狀？",
+                options: [
+                    "減少飲水量以降低膀胱刺激。",
+                    "避免辛辣、咖啡因等刺激性食物。",
+                    "長期服用抗生素以預防感染。",
+                    "進行膀胱灌注化療藥物。"
+                ],
+                answer: 1,
+                explanation: "放射性膀胱炎是一種無菌性炎症，避免刺激性食物和飲料可以減少膀胱的刺激，從而緩解頻尿、尿急等症狀。抗生素對無菌性炎症無效，膀胱灌注化療藥物不適用於放射性膀胱炎。"
+            },
+            {
+                question: "一位腎臟移植患者，術後出現發燒，血清CMV DNA PCR陽性。護理師應理解此類患者的CMV感染，其治療策略通常包括？",
+                options: [
+                    "口服廣效抗生素。",
+                    "靜脈注射抗病毒藥物。",
+                    "增加免疫抑制劑劑量。",
+                    "進行透析治療。"
+                ],
+                answer: 1,
+                explanation: "巨細胞病毒(CMV)感染是器官移植患者常見的併發症，尤其在免疫抑制狀態下，可能引起嚴重疾病。CMV是病毒，因此需要使用特定的抗病毒藥物（如Ganciclovir或Valganciclovir）進行治療，且通常需要靜脈注射以確保足夠的藥物濃度。"
+            },
+            {
+                question: "一位因糖尿病導致神經性膀胱的患者，護理師在衛教其進行清潔間歇性導尿時，應強調哪項步驟以降低感染風險？",
+                options: [
+                    "每次導尿前使用肥皂徹底清洗雙手。",
+                    "導尿管可重複使用，但需用酒精消毒。",
+                    "導尿時，盡量避免觸摸導尿管的遠端。",
+                    "導尿後立即服用預防性抗生素。"
+                ],
+                answer: 0,
+                explanation: "清潔間歇性導尿雖然不是無菌操作，但嚴格的手部衛生是預防感染的基石。每次導尿前徹底清洗雙手能顯著減少細菌帶入尿道的風險。導尿管的消毒和重複使用需遵循專業指導，一般不建議酒精消毒。"
+            },
+            {
+                question: "一位女性患者，因反覆泌尿道感染，醫師考慮進行膀胱鏡檢查以排除結構異常。術前護理師應告知患者可能出現的術後不適有哪些？",
+                options: [
+                    "劇烈腹痛。",
+                    "高燒伴寒顫。",
+                    "輕微血尿和排尿灼熱感。",
+                    "全身皮疹。"
+                ],
+                answer: 2,
+                explanation: "膀胱鏡檢查是一種侵入性操作，術後常見的輕微不適包括排尿時的灼熱感、頻尿以及輕微血尿。這些症狀通常是暫時性的。劇烈腹痛或高燒伴寒顫可能提示併發症（如感染），全身皮疹則更像過敏反應。"
+            },
+            {
+                question: "一位因腎臟膿腫導致高燒的患者，經引流手術後，發燒仍持續。護理師應密切監測患者哪些生命徵象變化，以警惕敗血症的進展？",
+                options: [
+                    "血壓升高、心率減慢。",
+                    "體溫降低、呼吸變淺。",
+                    "血壓下降、心率加快、呼吸急促。",
+                    "血糖升高、意識模糊。"
+                ],
+                answer: 2,
+                explanation: "敗血症（特別是敗血症性休克）的典型表現包括低血壓、心率加快（代償性）、呼吸急促。持續高燒且引流後仍未改善，提示感染可能未完全控制或已進展為全身性感染，需密切監測這些關鍵生命徵象。"
+            },
+            {
+                question: "一位因長期使用抗生素導致腸道菌群失衡的患者，出現持續性腹瀉。護理師在衛教患者時，可建議補充哪類食物以幫助恢復腸道健康？",
+                options: [
+                    "高脂肪食物。",
+                    "高糖食物。",
+                    "益生菌發酵食品（如優格、優酪乳）。",
+                    "油炸食品。"
+                ],
+                answer: 2,
+                explanation: "抗生素會殺滅腸道內的有益菌，導致菌群失衡，引起腹瀉。補充益生菌（存在於優格、優酪乳等發酵食品中）有助於恢復腸道正常菌群，緩解腹瀉。高脂肪、高糖和油炸食品可能加重腸道負擔。"
+            },
+            {
+                question: "一位女性患者，因反覆泌尿道感染，醫師建議進行低劑量抗生素預防性治療。護理師應告知患者此治療的主要風險為何？",
+                options: [
+                    "增加腎結石的風險。",
+                    "導致高血壓。",
+                    "增加抗生素耐藥性。",
+                    "引起嚴重的脫水。"
+                ],
+                answer: 2,
+                explanation: "長期低劑量抗生素預防性治療的主要風險是增加細菌產生抗生素耐藥性的機會，這會使未來的感染更難治療。其他選項不是此治療的常見或主要風險。"
+            },
+            {
+                question: "一位因膀胱結石導致反覆泌尿道感染的患者，接受了經尿道膀胱碎石術。術後護理師應重點觀察患者哪些情況？",
+                options: [
+                    "術後體重變化。",
+                    "尿液顏色和性狀。",
+                    "患者的睡眠模式。",
+                    "皮膚完整性。"
+                ],
+                answer: 1,
+                explanation: "膀胱碎石術後，尿液中可能帶有血塊或碎石，因此密切觀察尿液的顏色（是否有血尿）和性狀（是否有混濁、碎石排出）對於評估術後恢復和潛在併發症（如出血、殘餘結石）至關重要。"
+            },
+            {
+                question: "一位有糖尿病史的男性患者，因急性腎盂腎炎住院。尿液培養顯示為ESBL (Extended-spectrum beta-lactamase) 產酶大腸桿菌。護理師應理解這意味著什麼？",
+                options: [
+                    "該細菌對所有抗生素都敏感。",
+                    "該細菌對多種常用抗生素具有抗藥性。",
+                    "該感染可通過口服藥物輕鬆治療。",
+                    "該細菌僅在糖尿病患者中引起感染。"
+                ],
+                answer: 1,
+                explanation: "ESBL產酶菌是一種對多種常用廣效性β-內醯胺類抗生素（包括許多頭孢菌素和青黴素）具有抗藥性的細菌，這使得治療選擇變得非常有限且複雜，通常需要使用碳青黴烯類抗生素。"
+            },
+            {
+                question: "一位老年女性患者，因反覆泌尿道感染，檢查發現有輕度子宮脫垂。護理師在衛教時，除了盆底肌運動，還可以建議哪項措施以改善症狀？",
+                options: [
+                    "長期臥床休息。",
+                    "使用子宮托 (Pessary)。",
+                    "增加咖啡因攝入。",
+                    "減少飲水量。"
+                ],
+                answer: 1,
+                explanation: "子宮脫垂可能影響膀胱功能，導致排尿不完全和增加感染風險。子宮托是一種非手術治療方法，可以支撐子宮和膀胱，改善脫垂症狀，從而可能改善排尿並降低感染風險。"
+            },
+            {
+                question: "一位患者因慢性腎盂腎炎導致腎功能不全。護理師在衛教患者飲食管理時，應建議哪項調整？",
+                options: [
+                    "增加蛋白質攝入。",
+                    "限制鈉和鉀的攝入。",
+                    "多吃高磷食物。",
+                    "完全避免飲水。"
+                ],
+                answer: 1,
+                explanation: "慢性腎功能不全的患者通常需要限制鈉（以控制血壓和水腫）和鉀（以預防高鉀血症）的攝入。增加蛋白質攝入會增加腎臟負擔，高磷食物會導致高磷血症，完全避免飲水會導致脫水和腎功能進一步惡化。"
+            },
+            {
+                question: "一位長期糖尿病患者，因免疫力低下導致反覆泌尿道感染。護理師應建議患者在日常生活中特別注意哪項？",
+                options: [
+                    "減少洗澡頻率。",
+                    "避免攝取任何糖分。",
+                    "保持良好的個人衛生習慣，尤其是會陰部清潔。",
+                    "長期服用維生素補充劑。"
+                ],
+                answer: 2,
+                explanation: "對於免疫力低下的糖尿病患者，良好的個人衛生習慣，特別是會陰部清潔，能有效減少細菌滋生，降低泌尿道感染的風險。減少洗澡頻率和避免所有糖分不切實際且可能有害，長期服用維生素補充劑對預防感染效果有限。"
+            },
+            {
+                question: "一位因膀胱過動症(OAB)導致頻尿、尿急的女性患者，同時有反覆泌尿道感染。護理師在衛教時，應建議患者避免哪類飲料？",
+                options: [
+                    "白開水。",
+                    "牛奶。",
+                    "咖啡和茶。",
+                    "新鮮果汁。"
+                ],
+                answer: 2,
+                explanation: "咖啡和茶含有咖啡因，會刺激膀胱，加重膀胱過動症的症狀，進而可能影響排尿模式，增加感染風險。白開水、牛奶和新鮮果汁通常不會對膀胱產生刺激。"
+            },
+            {
+                question: "一位男性患者，因前列腺增生導致排尿困難，長期服用α-受體阻滯劑。近期出現發燒、寒顫，診斷為泌尿道感染。護理師應了解此類患者感染的常見原因為何？",
+                options: [
+                    "藥物副作用。",
+                    "膀胱排空不完全導致尿液滯留。",
+                    "飲水不足。",
+                    "性行為頻繁。"
+                ],
+                answer: 1,
+                explanation: "良性前列腺增生會導致尿道阻塞，使得膀胱無法完全排空，殘餘尿液成為細菌滋生的溫床，這是引起泌尿道感染的常見原因。α-受體阻滯劑雖然能緩解排尿困難，但並不能完全解決阻塞問題。藥物副作用、飲水不足和性行為頻繁並非此類患者感染的主要原因。"
+            },
+            {
+                question: "一位女性患者，因反覆泌尿道感染，醫師建議進行尿液動力學檢查。護理師應告知患者此檢查的主要目的為何？",
+                options: [
+                    "確定感染的病原菌。",
+                    "評估膀胱和尿道的儲尿及排尿功能。",
+                    "檢查是否有腎臟結石。",
+                    "評估腎功能狀況。"
+                ],
+                answer: 1,
+                explanation: "尿液動力學檢查主要用於評估膀胱和尿道的儲尿和排尿功能，包括膀胱容量、壓力、尿流率等，以找出導致排尿功能障礙和反覆感染的潛在原因。它不能確定病原菌、檢查腎臟結石或直接評估腎功能。"
+            },
+            {
+                question: "一位兒童患者，因反覆泌尿道感染，經檢查診斷為慢性腎盂腎炎。護理師在衛教家長時，應強調哪項長期管理的重要性？",
+                options: [
+                    "避免孩子上學，減少感染機會。",
+                    "嚴格控制飲食，避免所有甜食。",
+                    "定期回診追蹤腎功能和尿液檢查。",
+                    "僅在發燒時才給予抗生素。"
+                ],
+                answer: 2,
+                explanation: "慢性腎盂腎炎可能導致腎功能受損，因此定期回診追蹤腎功能和尿液檢查，監測感染復發和腎臟健康狀況至關重要。避免上學、嚴格控制甜食和僅在發燒時給予抗生素都是不恰當或不全面的建議。"
+            },
+            {
+                question: "一位老年患者，因長期臥床和免疫力低下，反覆發生泌尿道感染。護理師在進行口腔護理時，應特別注意哪項？",
+                options: [
+                    "使用含氟牙膏。",
+                    "定期清潔口腔，保持口腔衛生。",
+                    "避免刷牙，以免損傷牙齦。",
+                    "僅在進食後進行口腔清潔。"
+                ],
+                answer: 1,
+                explanation: "良好的口腔衛生對於預防全身性感染（包括泌尿道感染）至關重要，尤其是在免疫力低下的患者中。口腔中的細菌可能進入血液循環，引起其他部位的感染。定期清潔口腔可以減少口腔細菌數量，降低感染風險。"
+            },
+            {
+                question: "一位女性患者，因急性膀胱炎就診，醫師開立了單劑量抗生素治療。護理師應告知患者此治療方案的優點為何？",
+                options: [
+                    "治療費用較低。",
+                    "副作用較少。",
+                    "服藥依從性較高。",
+                    "對所有細菌都有效。"
+                ],
+                answer: 2,
+                explanation: "單劑量抗生素治療的主要優點是服藥依從性高，患者只需服用一次藥物即可完成治療，降低了忘記服藥或提前停藥的風險，這對於確保治療效果非常重要。副作用和治療費用不一定是主要優點，且沒有抗生素對所有細菌都有效。"
+            },
+            {
+                question: "一位因尿路結石導致反覆泌尿道感染的患者，接受了體外震波碎石術 (ESWL)。術後護理師應建議患者如何促進碎石排出？",
+                options: [
+                    "嚴格限制飲水。",
+                    "多活動，鼓勵跳躍。",
+                    "長期臥床休息。",
+                    "服用止痛藥即可。"
+                ],
+                answer: 1,
+                explanation: "ESWL術後，鼓勵患者多飲水和適度活動（如散步、跳躍）有助於碎石通過尿路排出。嚴格限制飲水會阻礙碎石排出，長期臥床休息也不利於碎石排出。服用止痛藥僅能緩解疼痛，無助於碎石排出。"
+            },
+            {
+                question: "一位男性患者，因尿道導管留置時間過長，導致尿道感染。護理師在衛教患者時，應強調哪項預防措施？",
+                options: [
+                    "每日更換導尿管。",
+                    "保持導尿管引流口乾燥清潔。",
+                    "增加導尿管的直徑。",
+                    "使用凡士林潤滑導尿管。"
+                ],
+                answer: 1,
+                explanation: "保持導尿管引流口的乾燥清潔是預防導尿管相關感染的重要措施，可以減少細菌從外部侵入。每日更換導尿管是不必要的且可能增加風險，增加導尿管直徑可能引起不適和損傷，使用凡士林潤滑可能堵塞導管。"
+            },
+            {
+                question: "一位老年女性患者，因膀胱功能退化導致排尿不完全，反覆泌尿道感染。護理師在衛教時，可建議患者嘗試哪項排尿技巧？",
+                options: [
+                    "快速排尿，不留餘尿。",
+                    "雙重排尿（Double Voiding）。",
+                    "憋尿，增加膀胱容量。",
+                    "僅在感覺非常脹時才排尿。"
+                ],
+                answer: 1,
+                explanation: "雙重排尿（Double Voiding）是指患者在第一次排尿後，稍微改變姿勢（如前傾），等待片刻後再次嘗試排尿，以確保膀胱排空更完全，減少殘餘尿液，從而降低感染風險。"
+            },
+            {
+                question: "一位女性患者，因長期使用避孕藥，近期反覆發生泌尿道感染。護理師應告知患者，避孕藥可能如何影響泌尿道健康？",
+                options: [
+                    "增加尿液酸度。",
+                    "改變陰道菌群平衡。",
+                    "增強膀胱收縮力。",
+                    "直接殺滅泌尿道細菌。"
+                ],
+                answer: 1,
+                explanation: "部分研究指出，口服避孕藥可能影響陰道菌群的平衡，改變陰道pH值，從而增加某些女性泌尿道感染的風險。它不會直接增加尿液酸度、增強膀胱收縮力或殺滅細菌。"
+            },
+            {
+                question: "一位因腎臟感染導致高燒的患者，醫師開立了廣效性抗生素。護理師在給藥前應優先確認哪項資訊？",
+                options: [
+                    "患者的飲食偏好。",
+                    "患者的過敏史。",
+                    "患者的睡眠時間。",
+                    "患者的運動習慣。"
+                ],
+                answer: 1,
+                explanation: "在給予任何藥物，尤其是抗生素時，優先確認患者的過敏史是至關重要的，以避免嚴重的過敏反應（如過敏性休克）。其他選項雖然是護理評估的一部分，但對於藥物安全而言，過敏史是最優先考慮的。"
+            },
+            {
+                question: "一位男性患者，因尿道結石導致排尿困難。在成功移除結石後，患者仍有輕微排尿不適。護理師應建議患者如何進行居家護理？",
+                options: [
+                    "避免飲水，減少排尿次數。",
+                    "多喝水，保持尿液稀釋。",
+                    "長期服用止痛藥。",
+                    "立即恢復劇烈運動。"
+                ],
+                answer: 1,
+                explanation: "移除尿道結石後，多喝水有助於沖刷尿路，排出殘餘的細小結石或結晶，並稀釋尿液，減少對尿道的刺激，從而緩解輕微不適並預防再次結石。避免飲水、長期服用止痛藥和立即劇烈運動都是不恰當的建議。"
+            },
+            {
+                question: "一位女性患者，因反覆泌尿道感染，醫師建議進行膀胱訓練。護理師應如何向患者解釋膀胱訓練的目的？",
+                options: [
+                    "減少膀胱容量。",
+                    "增加排尿頻率。",
+                    "延長排尿間隔，恢復膀胱功能。",
+                    "增強尿道括約肌力量。"
+                ],
+                answer: 2,
+                explanation: "膀胱訓練的目的是通過逐步延長排尿間隔，幫助患者重新獲得對膀胱的控制，增加膀胱容量，減少頻尿和尿急的症狀，從而改善膀胱功能。它不是為了減少膀胱容量或增加排尿頻率。"
+            },
+            {
+                question: "一位因長期臥床導致泌尿道感染的患者，護理師在制定護理計畫時，應優先考慮哪項措施以預防壓瘡和感染？",
+                options: [
+                    "每小時翻身一次。",
+                    "使用高蛋白飲食。",
+                    "保持皮膚清潔乾燥，定期翻身。",
+                    "限制患者活動。"
+                ],
+                answer: 2,
+                explanation: "對於長期臥床的患者，保持皮膚清潔乾燥並定期翻身是預防壓瘡和皮膚感染的關鍵措施。潮濕和壓力是壓瘡和皮膚感染的主要危險因素。雖然高蛋白飲食有助於傷口癒合，但不如皮膚護理和翻身來得直接有效。限制活動會增加風險。"
+            },
+            {
+                question: "一位男性患者，因攝護腺肥大導致尿液滯留，並引起急性泌尿道感染。在緊急導尿後，護理師應特別注意患者可能出現的哪種情況？",
+                options: [
+                    "血壓升高。",
+                    "排尿困難加劇。",
+                    "血尿加重。",
+                    "導尿後血尿（Post-obstructive diuresis）。"
+                ],
+                answer: 3,
+                explanation: "對於長期尿液滯留的患者，在解除阻塞（導尿）後，可能會出現導尿後利尿（Post-obstructive diuresis），表現為大量稀釋尿液的排出，這可能導致電解質紊亂和脫水。因此，護理師應密切監測尿量和電解質平衡。"
+            },
+            {
+                question: "一位女性患者，因反覆泌尿道感染，醫師考慮給予陰道益生菌補充。護理師應告知患者此治療的主要目的為何？",
+                options: [
+                    "直接殺滅泌尿道病原菌。",
+                    "恢復陰道正常菌群，增強局部抵抗力。",
+                    "增加陰道分泌物。",
+                    "緩解排尿疼痛。"
+                ],
+                answer: 1,
+                explanation: "陰道益生菌（如乳酸桿菌）補充的主要目的是恢復陰道內正常的菌群平衡，抑制病原菌的生長，從而增強陰道和泌尿道的局部抵抗力，降低感染風險。它不直接殺滅病原菌，也不會增加陰道分泌物或直接緩解疼痛。"
+            },
+            {
+                question: "一位患者因泌尿道感染接受抗生素治療後，出現噁心、嘔吐。護理師應建議患者如何緩解這些副作用？",
+                options: [
+                    "立即停止服用抗生素。",
+                    "空腹服用抗生素。",
+                    "與食物一起服用抗生素。",
+                    "增加抗生素劑量。"
+                ],
+                answer: 2,
+                explanation: "許多抗生素可能引起胃腸道不適，如噁心、嘔吐。建議患者與食物一起服用抗生素，可以減少對胃腸道的刺激，從而緩解這些副作用。立即停藥或增加劑量是不恰當的，空腹服用可能加重不適。"
+            },
+            {
+                question: "一位老年患者，因長期使用導尿管，近期出現導尿管周圍滲漏。護理師應優先評估哪項原因？",
+                options: [
+                    "導尿管尺寸過大。",
+                    "尿路感染導致膀胱痙攣。",
+                    "患者飲水過多。",
+                    "尿袋位置過低。"
+                ],
+                answer: 1,
+                explanation: "導尿管周圍滲漏最常見的原因之一是尿路感染引起的膀胱痙攣。膀胱痙攣會導致膀胱肌肉不自主收縮，迫使尿液從導尿管周圍漏出。導尿管尺寸過大或過小都可能引起滲漏，但感染引起的痙攣是更常見的臨床原因。"
+            },
+            {
+                question: "一位兒童患者，因反覆泌尿道感染，經檢查發現有腎臟疤痕。護理師在衛教家長時，應強調哪項長期併發症的風險？",
+                options: [
+                    "高血壓。",
+                    "糖尿病。",
+                    "慢性腎功能不全。",
+                    "心臟病。"
+                ],
+                answer: 2,
+                explanation: "反覆的泌尿道感染，特別是腎盂腎炎，可能導致腎臟實質損傷和疤痕形成。長期的腎臟疤痕會影響腎功能，最終可能導致慢性腎功能不全。高血壓是慢性腎功能不全的常見併發症，但慢性腎功能不全本身是更直接的風險。"
+            },
+            {
+                question: "一位女性患者，因性交後反覆泌尿道感染。護理師在衛教時，除了性交後排尿，還應建議哪項生活習慣調整？",
+                options: [
+                    "使用陰道栓劑。",
+                    "穿著緊身內褲。",
+                    "從前向後擦拭會陰部。",
+                    "限制液體攝入。"
+                ],
+                answer: 2,
+                explanation: "從前向後擦拭會陰部是預防女性UTI的重要措施，可以避免將肛門周圍的細菌帶入尿道。穿著緊身內褲可能增加潮濕和細菌滋生。陰道栓劑和限制液體攝入不是預防UTI的常規建議。"
+            },
+            {
+                question: "一位糖尿病患者，因泌尿道感染入院。護理師在評估患者時，應特別關注哪項指標，以判斷感染的嚴重程度？",
+                options: [
+                    "體重。",
+                    "血糖水平。",
+                    "血紅蛋白。",
+                    "血小板計數。"
+                ],
+                answer: 1,
+                explanation: "對於糖尿病患者，血糖控制不佳會加重感染，而感染也會導致血糖升高。因此，密切監測血糖水平對於判斷感染的嚴重程度和治療效果至關重要。高血糖會影響免疫反應，使感染更難控制。"
+            },
+            {
+                question: "一位男性患者，因長期留置導尿管，近期出現尿液混濁、異味，但無發燒。尿液培養顯示為多種細菌生長。護理師應如何解讀此情況？",
+                options: [
+                    "這是導尿管的正常現象，無需處理。",
+                    "提示導尿管相關菌尿症，但可能無需治療。",
+                    "立即更換導尿管並給予抗生素。",
+                    "患者可能需要進行腎臟移植。"
+                ],
+                answer: 1,
+                explanation: "對於長期留置導尿管的患者，無症狀的菌尿症（尿液混濁、異味，但無發燒等感染症狀）非常常見，通常是由於導尿管內生物膜形成。在沒有感染症狀的情況下，通常無需治療，因為治療反而可能增加抗生素耐藥性。只有出現發燒或其他感染症狀時才考慮治療。"
+            },
+            {
+                question: "一位老年女性患者，因反覆泌尿道感染，醫師建議進行手術矯正膀胱脫垂。術後護理衛教應包含哪項重點？",
+                options: [
+                    "術後需長期臥床。",
+                    "避免咳嗽和便秘，以減少腹壓。",
+                    "術後可立即恢復正常性生活。",
+                    "無需進行任何復健運動。"
+                ],
+                answer: 1,
+                explanation: "膀胱脫垂手術後，應避免增加腹壓的活動（如咳嗽、便秘、提重物），以保護手術修復的部位，防止復發。因此，衛教患者避免咳嗽和保持排便通暢非常重要。"
+            },
+            {
+                question: "一位患者因急性腎盂腎炎住院，醫師開立了靜脈注射抗生素。護理師在執行靜脈輸液時，應特別注意哪項感染控制原則？",
+                options: [
+                    "戴手套即可，無需洗手。",
+                    "在無菌操作區準備藥物，並嚴格消毒注射部位。",
+                    "共用輸液幫浦，節省資源。",
+                    "輸液管路可重複使用。"
+                ],
+                answer: 1,
+                explanation: "在執行靜脈輸液時，嚴格的無菌操作是預防導管相關血流感染的關鍵。這包括在無菌操作區準備藥物、嚴格消毒注射部位、正確佩戴手套並在操作前後洗手。共用設備和重複使用管路會增加感染風險。"
+            },
+            {
+                question: "一位女性患者，因反覆泌尿道感染，醫師建議進行尿液酸化治療。護理師應告知患者，此治療的主要目的是什麼？",
+                options: [
+                    "殺滅所有細菌。",
+                    "改變尿液pH值，抑制細菌生長。",
+                    "增加尿量，沖刷細菌。",
+                    "緩解排尿疼痛。"
+                ],
+                answer: 1,
+                explanation: "尿液酸化治療的目的是通過降低尿液的pH值，創造一個不利於細菌生長的環境，從而抑制細菌繁殖，減少感染。它不能殺滅所有細菌，也不是為了增加尿量或直接緩解疼痛。"
+            },
+            {
+                question: "一位長期使用抗生素的患者，出現口腔念珠菌感染（鵝口瘡）。護理師應建議患者如何進行口腔護理？",
+                options: [
+                    "停止刷牙，避免刺激。",
+                    "使用含酒精漱口水。",
+                    "使用軟毛牙刷輕柔刷牙，並保持口腔清潔。",
+                    "僅在進食後漱口。"
+                ],
+                answer: 2,
+                explanation: "口腔念珠菌感染需要保持良好的口腔衛生，使用軟毛牙刷輕柔刷牙可以清除口腔內的菌斑和食物殘渣，同時避免損傷黏膜。含酒精漱口水可能刺激黏膜，停止刷牙會加重感染，僅在進食後漱口不足以控制感染。"
+            },
+            {
+                question: "一位男性患者，因攝護腺增生導致慢性尿液滯留，反覆發生泌尿道感染。護理師應告知患者，若不積極處理尿液滯留，可能導致哪項長期併發症？",
+                options: [
+                    "高血壓。",
+                    "糖尿病。",
+                    "腎功能損害。",
+                    "心臟病。"
+                ],
+                answer: 2,
+                explanation: "長期尿液滯留會導致膀胱壓力升高，影響腎臟的正常功能，最終可能導致腎功能損害，甚至腎衰竭。因此，積極處理尿液滯留對於保護腎功能至關重要。"
+            },
+            {
+                question: "一位女性患者，因反覆泌尿道感染，醫師建議她嘗試服用蔓越莓補充劑。護理師應告知患者，蔓越莓的作用機制可能為何？",
+                options: [
+                    "直接殺滅細菌。",
+                    "酸化尿液，抑制細菌生長。",
+                    "防止細菌附著在泌尿道壁上。",
+                    "增強免疫力。"
+                ],
+                answer: 2,
+                explanation: "蔓越莓被認為含有原花青素 (PACs)，這些物質可以防止大腸桿菌等細菌附著在泌尿道上皮細胞上，從而降低感染的風險。它不直接殺滅細菌，對尿液pH值的影響也有限。"
+            },
+            {
+                question: "在照護一位有留置導尿管的患者時，護理師應定期檢查尿液的哪項特徵，以早期發現泌尿道感染？",
+                options: [
+                    "尿液溫度。",
+                    "尿液顏色和氣味。",
+                    "尿液比重。",
+                    "尿液中糖分含量。"
+                ],
+                answer: 1,
+                explanation: "尿液顏色（如混濁、血尿）和氣味（如惡臭）是泌尿道感染的常見早期徵兆。護理師應定期觀察這些變化，以便及早發現潛在感染。尿液溫度、比重和糖分含量通常不是早期發現UTI的直接指標。"
+            },
+            {
+                question: "一位男性患者，因尿道狹窄導致反覆泌尿道感染。醫師建議進行尿道重建手術。術後護理師應告知患者，術後恢復期間最需要避免哪項活動？",
+                options: [
+                    "走路。",
+                    "提重物或劇烈運動。",
+                    "輕度伸展。",
+                    "正常飲食。"
+                ],
+                answer: 1,
+                explanation: "尿道重建手術後，需要避免提重物或劇烈運動，因為這些活動會增加腹壓，可能對手術部位造成壓力和損傷，影響癒合或導致併發症。適度的走路和輕度伸展通常是允許的，正常飲食也是恢復所需。"
+            },
+            {
+                question: "一位女性患者，因反覆泌尿道感染，醫師建議她注意會陰部清潔。護理師應指導患者使用哪種方式進行清潔？",
+                options: [
+                    "使用強力消毒劑每日沖洗陰道。",
+                    "用肥皂和水從後向前清洗。",
+                    "用清水從前向後輕柔擦拭。",
+                    "使用濕紙巾替代清洗。"
+                ],
+                answer: 2,
+                explanation: "用清水從前向後輕柔擦拭會陰部是女性預防泌尿道感染的重要措施，可以避免將肛門周圍的細菌帶入尿道。強力消毒劑和陰道沖洗可能破壞陰道正常菌群，從後向前清洗會增加感染風險，濕紙巾不能完全替代清洗。"
+            },
+            {
+                question: "一位老年患者，因長期使用抗生素，導致腸道菌群失衡，出現腹瀉。護理師在衛教患者時，應建議哪項飲食調整？",
+                options: [
+                    "多吃生冷食物。",
+                    "多吃油膩食物。",
+                    "多吃發酵食品，如優格、泡菜。",
+                    "多吃辛辣食物。"
+                ],
+                answer: 2,
+                explanation: "發酵食品（如優格、泡菜、酸奶）富含益生菌，有助於補充腸道內的有益菌群，恢復腸道平衡，從而緩解抗生素引起的腹瀉。生冷、油膩和辛辣食物可能加重腸道不適。"
+            },
+            {
+                question: "一位女性患者，因反覆泌尿道感染，醫師建議進行低劑量抗生素預防性治療。護理師應告知患者，此類預防性治療通常持續多久？",
+                options: [
+                    "僅在有症狀時服用。",
+                    "數天。",
+                    "數週至數月，甚至更長時間。",
+                    "終身服用。"
+                ],
+                answer: 2,
+                explanation: "對於反覆泌尿道感染的患者，預防性抗生素治療通常需要持續較長時間，從數週到數月，甚至在某些情況下更長，以有效降低感染復發率。僅在有症狀時服用是治療而非預防，數天不足以達到預防效果，終身服用則過於絕對。"
+            },
+            {
+                question: "一位因脊髓損傷導致神經性膀胱的患者，其膀胱功能評估顯示膀胱逼尿肌反射亢進。護理師應理解這可能導致哪種排尿問題？",
+                options: [
+                    "尿失禁。",
+                    "尿液滯留。",
+                    "尿流過快。",
+                    "排尿無力。"
+                ],
+                answer: 0,
+                explanation: "膀胱逼尿肌反射亢進意味著膀胱肌肉過於活躍，會不自主地收縮，導致頻尿、尿急和急迫性尿失禁。這與尿液滯留（排空困難）或排尿無力（膀胱收縮不足）不同。"
+            },
+            {
+                question: "一位老年男性患者，因長期臥床，留置導尿管。護理師在進行導尿管護理時，應特別注意哪項以預防導尿管阻塞？",
+                options: [
+                    "每日更換導尿管。",
+                    "定期沖洗膀胱。",
+                    "確保足夠的液體攝入，保持尿液稀釋。",
+                    "限制患者活動。"
+                ],
+                answer: 2,
+                explanation: "足夠的液體攝入可以保持尿液稀釋，減少尿液中結晶和沉積物的形成，從而降低導尿管阻塞的風險。每日更換導尿管是不必要的，定期沖洗膀胱應在醫囑下進行，限制活動與預防阻塞無直接關係。"
+            },
+            {
+                question: "一位女性患者，因反覆泌尿道感染，醫師建議她穿著寬鬆透氣的棉質內褲。護理師應解釋此建議的主要目的為何？",
+                options: [
+                    "減少細菌滋生。",
+                    "增加時尚感。",
+                    "改善血液循環。",
+                    "防止過敏反應。"
+                ],
+                answer: 0,
+                explanation: "寬鬆透氣的棉質內褲有助於保持會陰部乾燥和通風，減少潮濕和悶熱的環境，從而抑制細菌和真菌的生長，降低泌尿道感染和陰道感染的風險。這與時尚感、血液循環或過敏反應無直接關係。"
+            },
+            {
+                question: "一位男性患者，因急性腎盂腎炎住院治療。在治療過程中，護理師應密切監測患者的哪項指標，以評估腎功能？",
+                options: [
+                    "血壓。",
+                    "血糖。",
+                    "血清肌酐酸和尿素氮。",
+                    "血紅蛋白。"
+                ],
+                answer: 2,
+                explanation: "血清肌酐酸和尿素氮 (BUN) 是評估腎功能最常用的指標。腎盂腎炎可能影響腎臟功能，因此密切監測這些指標對於評估腎臟受損程度和治療效果至關重要。血壓、血糖和血紅蛋白雖然重要，但不是直接評估腎功能的指標。"
+            },
+            {
+                question: "一位患者因泌尿道感染接受抗生素治療。護理師在衛教患者時，應強調哪項重要資訊？",
+                options: [
+                    "一旦症狀改善即可停藥。",
+                    "將剩餘抗生素留待下次感染使用。",
+                    "按醫囑完成整個抗生素療程。",
+                    "與他人分享抗生素。"
+                ],
+                answer: 2,
+                explanation: "按醫囑完成整個抗生素療程是確保感染徹底清除和預防細菌產生耐藥性的關鍵。過早停藥、將剩餘藥物留用或與他人分享都是不恰當且危險的行為，可能導致治療失敗和抗藥性問題。"
+            },
+            {
+                question: "一位女性患者，因反覆泌尿道感染，醫師建議她避免泡澡，改用淋浴。護理師應解釋此建議的主要原因為何？",
+                options: [
+                    "泡澡會使皮膚乾燥。",
+                    "泡澡會增加細菌進入尿道的機會。",
+                    "淋浴更節省水資源。",
+                    "泡澡會引起過敏反應。"
+                ],
+                answer: 1,
+                explanation: "泡澡時，浴缸中的水可能受到污染，細菌容易進入尿道，增加泌尿道感染的風險。淋浴則能有效沖刷會陰部，減少細菌暴露。因此，對於反覆感染的患者，建議淋浴而非泡澡。"
+            },
+            {
+                question: "一位長期使用免疫抑制劑的腎臟移植患者，因泌尿道感染住院。護理師在照護時，應特別注意哪項感染控制措施？",
+                options: [
+                    "無需特殊隔離，正常護理即可。",
+                    "嚴格執行手部衛生，並可能需要接觸隔離。",
+                    "限制探視人數，避免交叉感染。",
+                    "僅在患者發燒時才戴口罩。"
+                ],
+                answer: 1,
+                explanation: "免疫抑制患者感染風險高，且可能感染多重抗藥性病原體。因此，嚴格執行手部衛生是基本，同時可能需要根據醫院政策和感染類型進行接觸隔離，以防止病原體傳播給其他患者或醫護人員。限制探視人數也是感染控制的一部分，但手部衛生和隔離是更直接的措施。"
+            }
+        ];
+
+        let shuffledQuestions = []; // The 10 questions for the current quiz
+        let currentQuestionIndex = 0;
+        let correctAnswersCount = 0;
+        let timerInterval;
+        let timeLeft = 600; // 10 minutes in seconds
+        let quizStarted = false;
+        let questionAnswered = false;
+        let quizSummary = [];
+        // Initialize quizAttemptCount from localStorage, default to 0 if not found
+        // Using a key specific to this quiz to avoid conflicts with other apps
+        let quizAttemptCount = parseInt(localStorage.getItem('utiQuizAttempts')) || 0;
+        const MAX_ATTEMPTS = 2;
+        const LOCAL_STORAGE_KEY = 'utiQuizAttempts'; // Define a key for localStorage
+
+        const startButton = document.getElementById('startButton');
+        const submitButton = document.getElementById('submitButton');
+        const retakeQuizButton = document.getElementById('retakeQuizButton');
+        const quizStartScreen = document.getElementById('quizStartScreen');
+        const quizContent = document.getElementById('quizContent');
+        const questionText = document.getElementById('questionText');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const timerContainer = document.getElementById('timerContainer');
+        const timerDisplay = document.getElementById('timer');
+        const feedbackMessage = document.getElementById('feedbackMessage');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const scoreBar = document.getElementById('scoreBar');
+        const scoreText = document.getElementById('scoreText');
+        const prizeMessage = document.getElementById('prizeMessage');
+        const summaryList = document.getElementById('summaryList');
+        const attemptsLeftDisplay = document.getElementById('attemptsLeftDisplay'); // Element to show attempts left
+
+        // Shuffle array function (Fisher-Yates)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Select 10 unique random questions from the full bank
+        function selectRandomQuestions(count) {
+            const shuffledBank = shuffleArray([...fullQuestionBank]);
+            return shuffledBank.slice(0, count);
+        }
+
+        // Update attempt count display and button states
+        function updateAttemptsDisplay() {
+            const attemptsRemaining = MAX_ATTEMPTS - quizAttemptCount;
+            attemptsLeftDisplay.textContent = `您還有 ${attemptsRemaining} 次測驗機會。`;
+
+            if (attemptsRemaining <= 0) {
+                startButton.disabled = true;
+                retakeQuizButton.style.display = 'none'; // Hide retake button if no attempts left
+                attemptsLeftDisplay.textContent = `您的測驗機會已用盡。`;
+                console.log('測驗機會已用盡。');
+            } else {
+                startButton.disabled = false;
+                // retakeQuizButton visibility is handled in endQuiz()
+            }
+        }
+
+        // Initialize quiz (start a new attempt)
+        function initQuiz() {
+            if (quizAttemptCount >= MAX_ATTEMPTS) {
+                console.log('測驗機會已用盡，無法開始新的測驗。');
+                return;
+            }
+
+            quizAttemptCount++;
+            localStorage.setItem(LOCAL_STORAGE_KEY, quizAttemptCount); // Save attempt count to localStorage
+            updateAttemptsDisplay(); // Update display immediately
+
+            shuffledQuestions = selectRandomQuestions(10); // Select 10 unique questions
+            currentQuestionIndex = 0;
+            correctAnswersCount = 0;
+            quizStarted = true;
+            quizSummary = []; // Reset summary for new attempt
+
+            quizStartScreen.style.display = 'none';
+            scoreDisplay.style.display = 'none';
+            quizContent.style.display = 'block';
+            timerContainer.style.display = 'block';
+            submitButton.style.display = 'block'; // Ensure submit button is visible
+
+            console.log(`--- 測驗嘗試 ${quizAttemptCount} 開始 ---`);
+            console.log('本次測驗題目順序 (前幾字):');
+            shuffledQuestions.forEach((q, i) => console.log(`${i + 1}. ${q.question.substring(0, 30)}...`));
+
+            displayQuestion();
+        }
+
+        // Display current question
+        function displayQuestion() {
+            if (currentQuestionIndex < shuffledQuestions.length) {
+                questionAnswered = false; // Allow answering for new question
+                timeLeft = 600; // Reset timer to 10 minutes for each question
+                updateTimerDisplay();
+                startTimer();
+
+                const q = shuffledQuestions[currentQuestionIndex];
+                questionText.textContent = `${currentQuestionIndex + 1}. ${q.question}`;
+                optionsContainer.innerHTML = '';
+                q.options.forEach((option, index) => {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'option-item flex items-center';
+                    optionDiv.innerHTML = `
+                        <input type="radio" id="option${index}" name="question" value="${index}" class="form-radio h-5 w-5 text-blue-600">
+                        <label for="option${index}" class="ml-3 text-base flex-grow">${option}</label>
+                    `;
+                    optionDiv.addEventListener('click', () => {
+                        if (!questionAnswered) {
+                            document.getElementById(`option${index}`).checked = true;
+                            document.querySelectorAll('.option-item').forEach(item => item.classList.remove('selected'));
+                            optionDiv.classList.add('selected');
+                        }
+                    });
+                    optionsContainer.appendChild(optionDiv);
+                });
+                feedbackMessage.classList.add('hidden'); // Hide previous feedback
+                feedbackMessage.textContent = '';
+                submitButton.disabled = false; // Enable submit button
+                enableOptions();
+            } else {
+                endQuiz(); // All questions answered, end the quiz
+            }
+        }
+
+        // Start countdown timer
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                playTickSound(); // Play tick sound
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    feedbackMessage.textContent = '時間到！本題未作答。';
+                    feedbackMessage.className = 'feedback-message feedback-incorrect';
+                    feedbackMessage.classList.remove('hidden');
+                    questionAnswered = true; // Mark as answered (timed out)
+                    disableOptions();
+                    recordAnswer(null, false); // Record as incorrect due to timeout
+                    setTimeout(nextQuestion, 2000); // Move to next question after a short delay
+                }
+            }, 1000);
+        }
+
+        // Update timer display
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            if (timeLeft <= 10) {
+                timerDisplay.style.color = '#dc2626'; // Red for last 10 seconds
+            } else {
+                timerDisplay.style.color = '#ef4444';
+            }
+        }
+
+        // Check selected answer and move to next question
+        function checkAnswer() {
+            if (questionAnswered) return; // Prevent multiple submissions for the same question
+
+            const selectedOption = document.querySelector('input[name="question"]:checked');
+            if (!selectedOption) {
+                feedbackMessage.textContent = '請選擇一個答案！';
+                feedbackMessage.className = 'feedback-message feedback-info';
+                feedbackMessage.classList.remove('hidden');
+                return;
+            }
+
+            const selectedAnswerIndex = parseInt(selectedOption.value);
+            const correctAnswerIndex = shuffledQuestions[currentQuestionIndex].answer;
+            const isCorrect = selectedAnswerIndex === correctAnswerIndex;
+
+            disableOptions(); // Disable options after submission
+            questionAnswered = true; // Mark as answered for this question
+            clearInterval(timerInterval); // Stop timer
+
+            if (isCorrect) {
+                feedbackMessage.textContent = '恭喜您，答案正確！';
+                feedbackMessage.className = 'feedback-message feedback-correct';
+                feedbackMessage.classList.remove('hidden');
+                correctAnswersCount++;
+            } else {
+                feedbackMessage.textContent = '答案錯誤。';
+                feedbackMessage.className = 'feedback-message feedback-incorrect';
+                feedbackMessage.classList.remove('hidden');
+                // Highlight correct answer for learning
+                const correctOptionDiv = optionsContainer.children[correctAnswerIndex];
+                correctOptionDiv.classList.add('correct');
+            }
+            recordAnswer(selectedAnswerIndex, isCorrect); // Record for summary
+
+            // Scroll to the top of the quiz content after submitting an answer
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            setTimeout(nextQuestion, 2000); // Move to next question after a short delay
+        }
+
+        // Record answer for summary
+        function recordAnswer(selected, correct) {
+            const q = shuffledQuestions[currentQuestionIndex];
+            quizSummary.push({
+                question: q.question,
+                selectedAnswer: selected !== null ? q.options[selected] : '未作答/時間到',
+                correctAnswer: q.options[q.answer],
+                isCorrect: correct,
+                explanation: q.explanation // Include explanation here
+            });
+        }
+
+        // Disable all options
+        function disableOptions() {
+            document.querySelectorAll('input[name="question"]').forEach(radio => {
+                radio.disabled = true;
+            });
+            document.querySelectorAll('.option-item').forEach(item => {
+                item.classList.add('disabled');
+            });
+        }
+
+        // Enable all options
+        function enableOptions() {
+            document.querySelectorAll('input[name="question"]').forEach(radio => {
+                radio.disabled = false;
+            });
+            document.querySelectorAll('.option-item').forEach(item => {
+                item.classList.remove('disabled');
+                item.classList.remove('correct'); // Clear highlight
+                item.classList.remove('incorrect'); // Clear highlight
+            });
+        }
+
+        // Move to next question or end quiz
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < shuffledQuestions.length) {
+                displayQuestion();
+            } else {
+                endQuiz();
+            }
+        }
+
+        // End quiz and show score
+        function endQuiz() {
+            clearInterval(timerInterval); // Ensure timer is stopped
+            timerContainer.style.display = 'none'; // Hide fixed timer
+            quizContent.style.display = 'none';
+            scoreDisplay.style.display = 'block';
+            
+            const percentage = (correctAnswersCount / shuffledQuestions.length) * 100;
+            scoreBar.style.width = `${percentage}%`;
+            if (percentage < 40) {
+                scoreBar.className = 'score-bar low';
+            } else if (percentage < 70) {
+                scoreBar.className = 'score-bar medium';
+            } else {
+                scoreBar.className = 'score-bar high';
+            }
+            scoreText.textContent = `您答對了 ${correctAnswersCount} 題，總分：${percentage.toFixed(1)}%`;
+
+            // Prize message logic
+            if (percentage === 100) {
+                prizeMessage.classList.remove('hidden');
+                console.log('恭喜！獲得滿分。獎品訊息已顯示。');
+            } else {
+                prizeMessage.classList.add('hidden');
+                console.log('未獲得滿分。獎品訊息已隱藏。');
+            }
+            console.log('最終分數百分比:', percentage);
+            console.log('答對題數:', correctAnswersCount);
+            console.log('總題數:', shuffledQuestions.length);
+            console.log('目前測驗嘗試次數:', quizAttemptCount);
+
+
+            // Display quiz summary
+            summaryList.innerHTML = '';
+            quizSummary.forEach((item, index) => {
+                const listItem = document.createElement('li');
+                listItem.classList.add('mb-4'); // Add some margin between summary items
+                listItem.innerHTML = `
+                    <p class="font-semibold text-gray-800">${index + 1}. ${item.question}</p>
+                    <p class="${item.isCorrect ? 'text-green-700' : 'text-red-700'}">您的答案: ${item.selectedAnswer} ${item.isCorrect ? ' (正確)' : ' (錯誤)'}</p>
+                    <p class="text-blue-700">正確答案: ${item.correctAnswer}</p>
+                    <p class="text-gray-600 text-sm mt-1">解釋: ${item.explanation}</p>
+                `;
+                summaryList.appendChild(listItem);
+            });
+
+            // Show/hide retake button based on attempts left AND score
+            // If perfect score, or 2 attempts used, no retake
+            if (percentage === 100 || quizAttemptCount >= MAX_ATTEMPTS) {
+                retakeQuizButton.style.display = 'none';
+                console.log('重新測驗按鈕已隱藏：滿分或嘗試次數已用盡。');
+            } else {
+                retakeQuizButton.style.display = 'block';
+                console.log('重新測驗按鈕已顯示：未滿分且仍有嘗試次數。');
+            }
+        }
+
+        // Event listeners
+        startButton.addEventListener('click', initQuiz);
+        submitButton.addEventListener('click', checkAnswer);
+        retakeQuizButton.addEventListener('click', () => {
+            scoreDisplay.style.display = 'none';
+            initQuiz(); // Start a new quiz attempt
+        });
+
+        // Basic screenshot prevention (not foolproof)
+        document.addEventListener('keydown', (e) => {
+            // Disable Print Screen, Cmd+Shift+4 (Mac), Ctrl+Shift+S (Windows Snip & Sketch)
+            if (e.key === 'PrintScreen' ||
+                (e.metaKey && e.shiftKey && e.key === '4') ||
+                (e.ctrlKey && e.shiftKey && e.key === 'S')) {
+                // console.warn('Screenshot attempt detected and blocked (best effort).');
+                // e.preventDefault(); // This might not always work depending on OS/Browser
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'PrintScreen') {
+                // console.warn('Screenshot attempt detected on keyup and blocked (best effort).');
+            }
+        });
+
+        // Prevent copying text
+        document.addEventListener('copy', (e) => {
+            // e.preventDefault();
+            // console.warn('Copy attempt detected and blocked.');
+        });
+
+        // Initial setup - hide quiz content and score display
+        document.addEventListener('DOMContentLoaded', () => {
+            quizContent.style.display = 'none';
+            scoreDisplay.style.display = 'none';
+            timerContainer.style.display = 'none';
+            updateAttemptsDisplay(); // Call to update display and button states on load
+        });
+    </script>
+</body>
+</html>
+
